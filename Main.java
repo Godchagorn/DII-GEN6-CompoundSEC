@@ -43,7 +43,7 @@ public class Main {
             String cardID = cardIDField.getText();
             String accessLevel = accessLevelField.getText();
             system.modifyCard(cardID, accessLevel);
-            logArea.append("Card " + cardID + " Masked: ****" + cardID.substring(cardID.length() - 4) + ")\n");
+            logArea.append("Card " + cardID + " Masked: **" + cardID.substring(cardID.length() - 4) + ")\n");
         });
 
         addButton.addActionListener(e -> {
@@ -68,15 +68,15 @@ public class Main {
 
         checkButton.addActionListener(e -> {
             String cardID = cardIDField.getText();
-            String accessLevel = accessLevelField.getText();
-            boolean access = system.checkAccess(cardID, accessLevel);
-            logArea.append("Card " + cardID + " access to " + accessLevel + ": " + (access ? "Granted" : "Denied") + "\n");
+            String requestedArea = accessLevelField.getText();
+            boolean access = system.checkAccess(cardID, requestedArea);
+            logArea.append("Card " + cardID + " access to " + requestedArea + ": " + (access ? "Granted" : "Denied") + "\n");
         });
 
         customerButton.addActionListener(e -> {
             String cardID = JOptionPane.showInputDialog("Enter your Card ID:");
-            String accessLevel = JOptionPane.showInputDialog("Enter requested Access Level:");
-            boolean access = system.checkAccess(cardID, accessLevel);
+            String requestedArea = JOptionPane.showInputDialog("Enter requested Access Level:");
+            boolean access = system.checkAccess(cardID, requestedArea);
             JOptionPane.showMessageDialog(null, "Access " + (access ? "Granted" : "Denied"));
         });
 
