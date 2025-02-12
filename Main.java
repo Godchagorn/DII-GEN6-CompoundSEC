@@ -5,6 +5,7 @@ import java.awt.*;
 public class Main {
     private AccessControlSystem system;
     private JFrame frame;
+    private JPanel cardPanel;
     private JTextField cardIDField, accessLevelField;
     private JTextArea logArea;
 
@@ -13,38 +14,52 @@ public class Main {
         frame = new JFrame("Access Control System");
         frame.setSize(500, 400);
         frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-        frame.setLayout(new GridLayout(6, 2));
 
-        frame.add(new JLabel("Card ID:"));
+        cardPanel = new JPanel();
+        cardPanel.setLayout(new CardLayout());
+
+        JPanel selectionPanel = new JPanel();
+        JButton adminButton = new JButton("Admin");
+        JButton customerButton = new JButton("Customer");
+
+        adminButton.addActionListener(e -> showAdminView());
+        customerButton.addActionListener(e -> showCustomerView());
+
+        selectionPanel.add(adminButton);
+        selectionPanel.add(customerButton);
+
+        cardPanel.add(selectionPanel, "Selection");
+        frame.add(cardPanel);
+
+        frame.setVisible(true);
+    }
+
+    private void showAdminView() {
+        cardPanel.removeAll();
+
+        JPanel adminPanel = new JPanel(new GridLayout(6, 2));
+
+        adminPanel.add(new JLabel("Card ID:"));
         cardIDField = new JTextField();
-        frame.add(cardIDField);
+        adminPanel.add(cardIDField);
 
-        frame.add(new JLabel("Access Level:"));
+        adminPanel.add(new JLabel("Access Level:"));
         accessLevelField = new JTextField();
-        frame.add(accessLevelField);
+        adminPanel.add(accessLevelField);
 
         JButton addButton = new JButton("Add Card");
         JButton modifyButton = new JButton("Modify Card");
         JButton revokeButton = new JButton("Revoke Card");
         JButton checkButton = new JButton("Check Access");
-        JButton customerButton = new JButton("Customer Access");
 
         logArea = new JTextArea();
         JScrollPane scrollPane = new JScrollPane(logArea);
 
-        frame.add(addButton);
-        frame.add(modifyButton);
-        frame.add(revokeButton);
-        frame.add(checkButton);
-        frame.add(customerButton);
-        frame.add(scrollPane);
-
-        addButton.addActionListener(e -> {
-            String cardID = cardIDField.getText();
-            String accessLevel = accessLevelField.getText();
-            system.modifyCard(cardID, accessLevel);
-            logArea.append("Card " + cardID + " Masked: **" + cardID.substring(cardID.length() - 4) + ")\n");
-        });
+        adminPanel.add(addButton);
+        adminPanel.add(modifyButton);
+        adminPanel.add(revokeButton);
+        adminPanel.add(checkButton);
+        adminPanel.add(scrollPane);
 
         addButton.addActionListener(e -> {
             String cardID = cardIDField.getText();
@@ -73,14 +88,33 @@ public class Main {
             logArea.append("Card " + cardID + " access to " + requestedArea + ": " + (access ? "Granted" : "Denied") + "\n");
         });
 
-        customerButton.addActionListener(e -> {
+        cardPanel.add(adminPanel, "Admin");
+        ((CardLayout) cardPanel.getLayout()).show(cardPanel, "Admin");
+
+        cardPanel.revalidate();
+        cardPanel.repaint();
+    }
+
+    private void showCustomerView() {
+        cardPanel.removeAll();
+
+        JPanel customerPanel = new JPanel(new BorderLayout());
+        JButton customerCheckButton = new JButton("Check Access");
+
+        customerCheckButton.addActionListener(e -> {
             String cardID = JOptionPane.showInputDialog("Enter your Card ID:");
             String requestedArea = JOptionPane.showInputDialog("Enter requested Access Level:");
             boolean access = system.checkAccess(cardID, requestedArea);
             JOptionPane.showMessageDialog(null, "Access " + (access ? "Granted" : "Denied"));
         });
 
-        frame.setVisible(true);
+        customerPanel.add(customerCheckButton, BorderLayout.CENTER);
+
+        cardPanel.add(customerPanel, "Customer");
+        ((CardLayout) cardPanel.getLayout()).show(cardPanel, "Customer");
+
+        cardPanel.revalidate();
+        cardPanel.repaint();
     }
 
     public static void main(String[] args) {
