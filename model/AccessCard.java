@@ -11,6 +11,18 @@ public class AccessCard {
         this.isActive = true;
     }
 
+    public String getMaskedCardID(){
+        return "****" + cardID.substring(cardID.length()-4);
+    }
+
+    public void setAccessLevel(String accessLevel, String admin){
+        if (admin.equals("Admin123")) {
+            this.accessLevel = accessLevel;
+        }else {
+            System.out.println("Not allowed!");
+        }
+    }
+
     public String getCardID() { return cardID; }
     public String getAccessLevel() { return accessLevel; }
     public boolean isActive() { return isActive; }
