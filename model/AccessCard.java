@@ -29,4 +29,5 @@ public class AccessCard {
 
     public void setAccessLevel(String accessLevel) { this.accessLevel = accessLevel; }
     public void deactivate() { this.isActive = false; }
+    
 }

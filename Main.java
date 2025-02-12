@@ -42,6 +42,13 @@ public class Main {
         addButton.addActionListener(e -> {
             String cardID = cardIDField.getText();
             String accessLevel = accessLevelField.getText();
+            system.modifyCard(cardID, accessLevel);
+            logArea.append("Card " + cardID + " Masked: ****" + cardID.substring(cardID.length() - 4) + ")\n");
+        });
+
+        addButton.addActionListener(e -> {
+            String cardID = cardIDField.getText();
+            String accessLevel = accessLevelField.getText();
             system.addCard(cardID, accessLevel);
             logArea.append("Card " + cardID + " added with access: " + accessLevel + "\n");
         });
