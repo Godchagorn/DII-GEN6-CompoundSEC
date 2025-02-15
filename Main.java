@@ -8,6 +8,7 @@ public class Main {
     private JPanel cardPanel;
     private JTextField cardIDField, accessLevelField;
     private JTextArea logArea;
+    private JTextArea auditLogArea;
 
     public Main() {
         system = new AccessControlSystem();
@@ -37,7 +38,7 @@ public class Main {
     private void showAdminView() {
         cardPanel.removeAll();
 
-        JPanel adminPanel = new JPanel(new GridLayout(6, 2));
+        JPanel adminPanel = new JPanel(new GridLayout(7, 2));
 
         adminPanel.add(new JLabel("Card ID:"));
         cardIDField = new JTextField();
@@ -51,14 +52,17 @@ public class Main {
         JButton modifyButton = new JButton("Modify Card");
         JButton revokeButton = new JButton("Revoke Card");
         JButton checkButton = new JButton("Check Access");
+        JButton viewLogButton = new JButton("View Audit Log");
 
-        logArea = new JTextArea();
+        logArea = new JTextArea(5, 30);
+        logArea.setEditable(false);
         JScrollPane scrollPane = new JScrollPane(logArea);
 
         adminPanel.add(addButton);
         adminPanel.add(modifyButton);
         adminPanel.add(revokeButton);
         adminPanel.add(checkButton);
+        adminPanel.add(viewLogButton);
         adminPanel.add(scrollPane);
 
         addButton.addActionListener(e -> {
@@ -87,13 +91,39 @@ public class Main {
             boolean access = system.checkAccess(cardID, requestedArea);
             String accessMessage = system.getAccessMessage(cardID);
             logArea.append("Card " + cardID + " access to " + requestedArea + ": " + (access ? "Granted" : "Denied") + "\n");
-            logArea.append(accessMessage + "\n");        });
+            logArea.append(accessMessage + "\n");
+        });
+
+        viewLogButton.addActionListener(e -> showAuditLogPopup());
 
         cardPanel.add(adminPanel, "Admin");
         ((CardLayout) cardPanel.getLayout()).show(cardPanel, "Admin");
 
         cardPanel.revalidate();
         cardPanel.repaint();
+    }
+
+    private void showAuditLogPopup() {
+        JFrame logFrame = new JFrame("Audit Log");
+        logFrame.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
+
+        String logs = system.getAuditLogs();
+        if (logs.isEmpty()) {
+            logs = "No audit logs available.";
+        }
+
+        JTextArea logTextArea = new JTextArea(logs);
+        logTextArea.setEditable(false);
+        logTextArea.setFont(new Font("Monospaced", Font.PLAIN, 14));
+
+        logTextArea.setSize(logTextArea.getPreferredSize());
+
+        JScrollPane scrollPane = new JScrollPane(logTextArea);
+
+        logFrame.add(scrollPane);
+        logFrame.pack(); //
+        logFrame.setLocationRelativeTo(frame);
+        logFrame.setVisible(true);
     }
 
     private void showCustomerView() {

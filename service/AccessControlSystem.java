@@ -1,16 +1,21 @@
 package service;
 
 import model.*;
+
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 
 public class AccessControlSystem implements CardManagementInterface {
     private HashMap<String, AccessCard> cards;
+    private List<AuditLog> auditLogs;
 
     public AccessControlSystem() {
         cards = new HashMap<>();
+        auditLogs = new ArrayList<>();
     }
 
-    private AccessLevel getAccessLevel(String accessLevel){
+    private AccessLevel getAccessLevel(String accessLevel) {
         switch (accessLevel.toLowerCase()) {
             case "medium floor":
                 return new MediumFloorAccess();
@@ -24,12 +29,14 @@ public class AccessControlSystem implements CardManagementInterface {
     @Override
     public void addCard(String cardID, String accessLevel) {
         cards.put(cardID, new AccessCard(cardID, getAccessLevel(accessLevel)));
+        auditLogs.add(new CardModification(cardID, "Added", accessLevel));
     }
 
     @Override
     public void modifyCard(String cardID, String newAccessLevel) {
         if (cards.containsKey(cardID)) {
             cards.get(cardID).setAccessLevel(getAccessLevel(newAccessLevel), "Admin123");
+            auditLogs.add(new CardModification(cardID, "Modified", newAccessLevel));
         }
     }
 
@@ -37,20 +44,37 @@ public class AccessControlSystem implements CardManagementInterface {
     public void revokeCard(String cardID) {
         if (cards.containsKey(cardID)) {
             cards.get(cardID).deactivate();
+            auditLogs.add(new CardModification(cardID, "Revoked", null));
         }
     }
 
     public boolean checkAccess(String cardID, String requestedArea) {
+        boolean accessGranted = false;
         if (cards.containsKey(cardID) && cards.get(cardID).isActive()) {
-            return cards.get(cardID).canAccess(requestedArea);
+            accessGranted = cards.get(cardID).canAccess(requestedArea);
         }
-        return false;
+        auditLogs.add(new AccessAttempt(cardID, requestedArea, accessGranted));
+        return accessGranted;
     }
 
     public String getAccessMessage(String cardID) {
         if (cards.containsKey(cardID) && cards.get(cardID).isActive()) {
-            return cards.get(cardID).getAccessLevel() + " - " + cards.get(cardID).canAccess(cardID);
+            return cards.get(cardID).getAccessLevel();
         }
         return "Card not found or inactive.";
+    }
+
+    public void printAuditLogs() {
+        for (AuditLog log : auditLogs) {
+            System.out.println(log.logEvent());
+        }
+    }
+        public String getAuditLogs() {
+            StringBuilder logs = new StringBuilder();
+            for (AuditLog log : auditLogs) {
+                logs.append(log.logEvent()).append("\n");
+            }
+            return logs.toString();
+
     }
 }
