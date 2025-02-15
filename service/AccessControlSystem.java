@@ -46,4 +46,11 @@ public class AccessControlSystem implements CardManagementInterface {
         }
         return false;
     }
+
+    public String getAccessMessage(String cardID) {
+        if (cards.containsKey(cardID) && cards.get(cardID).isActive()) {
+            return cards.get(cardID).getAccessLevel() + " - " + cards.get(cardID).canAccess(cardID);
+        }
+        return "Card not found or inactive.";
+    }
 }

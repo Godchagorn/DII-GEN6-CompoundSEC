@@ -85,8 +85,9 @@ public class Main {
             String cardID = cardIDField.getText();
             String requestedArea = accessLevelField.getText();
             boolean access = system.checkAccess(cardID, requestedArea);
+            String accessMessage = system.getAccessMessage(cardID);
             logArea.append("Card " + cardID + " access to " + requestedArea + ": " + (access ? "Granted" : "Denied") + "\n");
-        });
+            logArea.append(accessMessage + "\n");        });
 
         cardPanel.add(adminPanel, "Admin");
         ((CardLayout) cardPanel.getLayout()).show(cardPanel, "Admin");
@@ -105,7 +106,8 @@ public class Main {
             String cardID = JOptionPane.showInputDialog("Enter your Card ID:");
             String requestedArea = JOptionPane.showInputDialog("Enter requested Access Level:");
             boolean access = system.checkAccess(cardID, requestedArea);
-            JOptionPane.showMessageDialog(null, "Access " + (access ? "Granted" : "Denied"));
+            String accessMessage = system.getAccessMessage(cardID);
+            JOptionPane.showMessageDialog(null, "Access " + (access ? "Granted" : "Denied") + "\n" + accessMessage);
         });
 
         customerPanel.add(customerCheckButton, BorderLayout.CENTER);

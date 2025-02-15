@@ -12,4 +12,6 @@ public abstract class AccessLevel {
     }
 
     public abstract boolean canAccess(String area);
+
+    public abstract String grantAccess();
 }

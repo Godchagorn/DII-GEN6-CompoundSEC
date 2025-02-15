@@ -9,4 +9,9 @@ public class LowFloorAccess extends AccessLevel {
     public boolean canAccess(String area) {
         return area.equalsIgnoreCase("Low Floor");
     }
+
+    @Override
+    public String grantAccess(){
+        return "Access Granted: Low Floor - Open to all basic cardholders";
+    }
 }
