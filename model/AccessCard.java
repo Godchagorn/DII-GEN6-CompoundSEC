@@ -1,5 +1,7 @@
 package model;
 
+import java.util.Objects;
+
 public class AccessCard {
     private String cardID;
     private AccessLevel accessLevel;
@@ -36,5 +38,20 @@ public class AccessCard {
     public void deactivate() {
         this.isActive = false;
     }
+
+    @Override
+    public boolean equals(Object obj) {
+        if (this == obj) return true;
+        if (obj == null || getClass() != obj.getClass()) return false;
+        AccessCard that = (AccessCard) obj;
+        return Objects.equals(cardID, that.cardID);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(cardID);
+    }
+
+
 
 }

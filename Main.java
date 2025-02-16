@@ -68,9 +68,14 @@ public class Main {
         addButton.addActionListener(e -> {
             String cardID = cardIDField.getText();
             String accessLevel = accessLevelField.getText();
-            system.addCard(cardID, accessLevel);
-            logArea.append("Card " + cardID + " added with access: " + accessLevel + "\n");
+            if (system.containsCard(cardID)) {
+                logArea.append("Error: Card " + cardID + " already exists!\n");
+            } else {
+                system.addCard(cardID, accessLevel);
+                logArea.append("Card " + cardID + " added with access: " + accessLevel + "\n");
+            }
         });
+
 
         modifyButton.addActionListener(e -> {
             String cardID = cardIDField.getText();

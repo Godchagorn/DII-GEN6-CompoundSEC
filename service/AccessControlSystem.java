@@ -28,7 +28,12 @@ public class AccessControlSystem implements CardManagementInterface {
 
     @Override
     public void addCard(String cardID, String accessLevel) {
-        cards.put(cardID, new AccessCard(cardID, getAccessLevel(accessLevel)));
+        if (cards.containsKey(cardID)) {
+            System.out.println("Error: Card with ID " + cardID + " already exists!");
+            return;
+        }
+        AccessCard newCard = new AccessCard(cardID, getAccessLevel(accessLevel));
+        cards.put(cardID, newCard);
         auditLogs.add(new CardModification(cardID, "Added", accessLevel));
     }
 
@@ -37,6 +42,8 @@ public class AccessControlSystem implements CardManagementInterface {
         if (cards.containsKey(cardID)) {
             cards.get(cardID).setAccessLevel(getAccessLevel(newAccessLevel), "Admin123");
             auditLogs.add(new CardModification(cardID, "Modified", newAccessLevel));
+        } else {
+            System.out.println("Error: Card with ID " + cardID + " not found!");
         }
     }
 
@@ -45,6 +52,8 @@ public class AccessControlSystem implements CardManagementInterface {
         if (cards.containsKey(cardID)) {
             cards.get(cardID).deactivate();
             auditLogs.add(new CardModification(cardID, "Revoked", null));
+        }else {
+            System.out.println("Error: Card with ID " + cardID + " not found!");
         }
     }
 
@@ -75,6 +84,10 @@ public class AccessControlSystem implements CardManagementInterface {
                 logs.append(log.logEvent()).append("\n");
             }
             return logs.toString();
-
     }
+
+    public boolean containsCard(String cardID) {
+        return cards.containsKey(cardID);
+    }
+
 }
