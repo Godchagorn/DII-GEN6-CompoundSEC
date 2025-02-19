@@ -8,7 +8,6 @@ public class Main {
     private JPanel cardPanel;
     private JTextField cardIDField, accessLevelField;
     private JTextArea logArea;
-    private JTextArea auditLogArea;
 
     public Main() {
         system = new AccessControlSystem();
@@ -68,8 +67,9 @@ public class Main {
         addButton.addActionListener(e -> {
             String cardID = cardIDField.getText();
             String accessLevel = accessLevelField.getText();
-            if (system.containsCard(cardID)) {
-                logArea.append("Error: Card " + cardID + " already exists!\n");
+
+            if (system.hasCard(cardID)) {
+                JOptionPane.showMessageDialog(frame, "Error: Card ID " + cardID + " already exists!", "Duplicate Card", JOptionPane.ERROR_MESSAGE);
             } else {
                 system.addCard(cardID, accessLevel);
                 logArea.append("Card " + cardID + " added with access: " + accessLevel + "\n");
@@ -96,7 +96,6 @@ public class Main {
             boolean access = system.checkAccess(cardID, requestedArea);
             String accessMessage = system.getAccessMessage(cardID);
             logArea.append("Card " + cardID + " access to " + requestedArea + ": " + (access ? "Granted" : "Denied") + "\n");
-            logArea.append(accessMessage + "\n");
         });
 
         viewLogButton.addActionListener(e -> showAuditLogPopup());
@@ -126,7 +125,7 @@ public class Main {
         JScrollPane scrollPane = new JScrollPane(logTextArea);
 
         logFrame.add(scrollPane);
-        logFrame.pack(); //
+        logFrame.setSize(400, 300);
         logFrame.setLocationRelativeTo(frame);
         logFrame.setVisible(true);
     }

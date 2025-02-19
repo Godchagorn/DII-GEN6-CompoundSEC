@@ -28,43 +28,53 @@ public class AccessControlSystem implements CardManagementInterface {
 
     @Override
     public void addCard(String cardID, String accessLevel) {
+        AccessCard newCard = new AccessCard(cardID, getAccessLevel(accessLevel));
+
         if (cards.containsKey(cardID)) {
-            System.out.println("Error: Card with ID " + cardID + " already exists!");
+            System.out.println("Error: Card ID " + cardID + " already exists!");
             return;
         }
-        AccessCard newCard = new AccessCard(cardID, getAccessLevel(accessLevel));
+
         cards.put(cardID, newCard);
         auditLogs.add(new CardModification(cardID, "Added", accessLevel));
     }
 
+
     @Override
     public void modifyCard(String cardID, String newAccessLevel) {
-        if (cards.containsKey(cardID)) {
-            cards.get(cardID).setAccessLevel(getAccessLevel(newAccessLevel), "Admin123");
-            auditLogs.add(new CardModification(cardID, "Modified", newAccessLevel));
-        } else {
-            System.out.println("Error: Card with ID " + cardID + " not found!");
+        if (!cards.containsKey(cardID)) {
+            System.out.println("Error: Card with ID " + cardID + " does not exist.");
+            return;
         }
+        cards.get(cardID).setAccessLevel(getAccessLevel(newAccessLevel), "Admin123");
+        auditLogs.add(new CardModification(cardID, "Modified", newAccessLevel));
     }
 
     @Override
     public void revokeCard(String cardID) {
-        if (cards.containsKey(cardID)) {
-            cards.get(cardID).deactivate();
-            auditLogs.add(new CardModification(cardID, "Revoked", null));
-        }else {
-            System.out.println("Error: Card with ID " + cardID + " not found!");
+        if (!cards.containsKey(cardID)) {
+            System.out.println("Error: Card with ID " + cardID + " does not exist.");
+            return;
         }
+        cards.get(cardID).deactivate();
+        auditLogs.add(new CardModification(cardID, "Revoked", null));
     }
 
     public boolean checkAccess(String cardID, String requestedArea) {
         boolean accessGranted = false;
-        if (cards.containsKey(cardID) && cards.get(cardID).isActive()) {
-            accessGranted = cards.get(cardID).canAccess(requestedArea);
+
+        if (cards.containsKey(cardID)) {
+            AccessCard card = cards.get(cardID);
+
+            if (card.isActive() && card.canAccess(requestedArea)) {
+                accessGranted = true;
+            }
         }
+
         auditLogs.add(new AccessAttempt(cardID, requestedArea, accessGranted));
         return accessGranted;
     }
+
 
     public String getAccessMessage(String cardID) {
         if (cards.containsKey(cardID) && cards.get(cardID).isActive()) {
@@ -73,21 +83,17 @@ public class AccessControlSystem implements CardManagementInterface {
         return "Card not found or inactive.";
     }
 
-    public void printAuditLogs() {
+    public String getAuditLogs() {
+        StringBuilder logs = new StringBuilder();
         for (AuditLog log : auditLogs) {
-            System.out.println(log.logEvent());
+            logs.append(log.logEvent()).append("\n");
         }
-    }
-        public String getAuditLogs() {
-            StringBuilder logs = new StringBuilder();
-            for (AuditLog log : auditLogs) {
-                logs.append(log.logEvent()).append("\n");
-            }
-            return logs.toString();
+        return logs.toString();
     }
 
-    public boolean containsCard(String cardID) {
+    public boolean hasCard(String cardID) {
         return cards.containsKey(cardID);
     }
+
 
 }

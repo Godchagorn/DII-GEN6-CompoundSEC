@@ -13,10 +13,6 @@ public class AccessCard {
         this.isActive = true;
     }
 
-    public String getMaskedCardID(){
-        return "****" + cardID.substring(cardID.length()-4);
-    }
-
     public void setAccessLevel(AccessLevel accessLevel, String adminKey){
         if (adminKey.equals("Admin123")) {
             this.accessLevel = accessLevel;
@@ -32,15 +28,15 @@ public class AccessCard {
     public boolean canAccess(String area) {
         return accessLevel.canAccess(area);
     }
-    public boolean isActive(){
+    public boolean isActive() {
         return isActive;
     }
-    public void deactivate() {
+    public void deactivate(){
         this.isActive = false;
     }
 
     @Override
-    public boolean equals(Object obj) {
+    public boolean equals(Object obj){
         if (this == obj) return true;
         if (obj == null || getClass() != obj.getClass()) return false;
         AccessCard that = (AccessCard) obj;
@@ -48,10 +44,7 @@ public class AccessCard {
     }
 
     @Override
-    public int hashCode() {
+    public int hashCode(){
         return Objects.hash(cardID);
     }
-
-
-
 }
