@@ -4,39 +4,41 @@ import java.util.Objects;
 
 public class AccessCard {
     private String cardID;
-    private AccessLevel accessLevel;
+    private AccessBehavior accessBehavior;
     private boolean isActive;
 
-    public AccessCard(String cardID, AccessLevel accessLevel) {
+    public AccessCard(String cardID, AccessBehavior accessBehavior) {
         this.cardID = cardID;
-        this.accessLevel = accessLevel;
+        this.accessBehavior = accessBehavior;
         this.isActive = true;
     }
 
-    public void setAccessLevel(AccessLevel accessLevel, String adminKey){
+    public void setAccessBehavior(AccessBehavior accessBehavior, String adminKey) {
         if (adminKey.equals("Admin123")) {
-            this.accessLevel = accessLevel;
-        }else {
+            this.accessBehavior = accessBehavior;
+        } else {
             System.out.println("Not allowed!");
         }
     }
 
     public String getAccessLevel() {
-        return accessLevel.getLevelName();
+        return accessBehavior.grantAccess();
     }
 
     public boolean canAccess(String area) {
-        return accessLevel.canAccess(area);
+        return accessBehavior.canAccess(area);
     }
+
     public boolean isActive() {
         return isActive;
     }
-    public void deactivate(){
+
+    public void deactivate() {
         this.isActive = false;
     }
 
     @Override
-    public boolean equals(Object obj){
+    public boolean equals(Object obj) {
         if (this == obj) return true;
         if (obj == null || getClass() != obj.getClass()) return false;
         AccessCard that = (AccessCard) obj;
@@ -44,7 +46,7 @@ public class AccessCard {
     }
 
     @Override
-    public int hashCode(){
+    public int hashCode() {
         return Objects.hash(cardID);
     }
 }

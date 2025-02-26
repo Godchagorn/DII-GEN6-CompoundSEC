@@ -15,7 +15,7 @@ public class AccessControlSystem implements CardManagementInterface {
         auditLogs = new ArrayList<>();
     }
 
-    private AccessLevel getAccessLevel(String accessLevel) {
+    private AccessBehavior getAccessBehavior(String accessLevel) {
         switch (accessLevel.toLowerCase()) {
             case "medium floor":
                 return new MediumFloorAccess();
@@ -28,7 +28,7 @@ public class AccessControlSystem implements CardManagementInterface {
 
     @Override
     public void addCard(String cardID, String accessLevel) {
-        AccessCard newCard = new AccessCard(cardID, getAccessLevel(accessLevel));
+        AccessCard newCard = new AccessCard(cardID, getAccessBehavior(accessLevel));
 
         if (cards.containsKey(cardID)) {
             System.out.println("Error: Card ID " + cardID + " already exists!");
@@ -39,14 +39,13 @@ public class AccessControlSystem implements CardManagementInterface {
         auditLogs.add(new CardModification(cardID, "Added", accessLevel));
     }
 
-
     @Override
     public void modifyCard(String cardID, String newAccessLevel) {
         if (!cards.containsKey(cardID)) {
             System.out.println("Error: Card with ID " + cardID + " does not exist.");
             return;
         }
-        cards.get(cardID).setAccessLevel(getAccessLevel(newAccessLevel), "Admin123");
+        cards.get(cardID).setAccessBehavior(getAccessBehavior(newAccessLevel), "Admin123");
         auditLogs.add(new CardModification(cardID, "Modified", newAccessLevel));
     }
 
@@ -75,7 +74,6 @@ public class AccessControlSystem implements CardManagementInterface {
         return accessGranted;
     }
 
-
     public String getAccessMessage(String cardID) {
         if (cards.containsKey(cardID) && cards.get(cardID).isActive()) {
             return cards.get(cardID).getAccessLevel();
@@ -94,6 +92,4 @@ public class AccessControlSystem implements CardManagementInterface {
     public boolean hasCard(String cardID) {
         return cards.containsKey(cardID);
     }
-
-
 }

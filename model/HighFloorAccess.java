@@ -1,10 +1,6 @@
 package model;
 
-public class HighFloorAccess extends AccessLevel {
-    public HighFloorAccess() {
-        super("High Floor");
-    }
-
+public class HighFloorAccess implements AccessBehavior {
     @Override
     public boolean canAccess(String area) {
         return true;
