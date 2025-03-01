@@ -1,40 +1,50 @@
 package model;
 
-import java.util.Objects;
-
 public class AccessCard {
     private String cardID;
-    private AccessBehavior accessBehavior;
-    private boolean isActive;
+    private String floor;
+    private String room;
+    private String name;
+    private boolean active;
 
-    public AccessCard(String cardID, AccessBehavior accessBehavior) {
+    public AccessCard(String cardID, String floor, String room, String name) {
         this.cardID = cardID;
-        this.accessBehavior = accessBehavior;
-        this.isActive = true;
+        this.floor = floor;
+        this.room = room;
+        this.name = name;
+        this.active = true;
     }
 
-    public void setAccessBehavior(AccessBehavior accessBehavior, String adminKey) {
-        if (adminKey.equals("Admin123")) {
-            this.accessBehavior = accessBehavior;
-        } else {
-            System.out.println("Not allowed!");
-        }
+    public String getCardID() {
+        return cardID;
     }
 
-    public String getAccessLevel() {
-        return accessBehavior.grantAccess();
+    public String getFloor() {
+        return floor;
     }
 
-    public boolean canAccess(String area) {
-        return accessBehavior.canAccess(area);
+    public void setFloor(String newFloor) {
+        this.floor = newFloor;
+    }
+
+    public String getRoom() {
+        return room;
+    }
+
+    public void setRoom(String newRoom) {
+        this.room = newRoom;
     }
 
     public boolean isActive() {
-        return isActive;
+        return active;
     }
 
     public void deactivate() {
-        this.isActive = false;
+        this.active = false;
+    }
+
+    public boolean canAccessRoom(String room) {
+        return room.startsWith(floor);
     }
 
     @Override
@@ -42,11 +52,20 @@ public class AccessCard {
         if (this == obj) return true;
         if (obj == null || getClass() != obj.getClass()) return false;
         AccessCard that = (AccessCard) obj;
-        return Objects.equals(cardID, that.cardID);
+        return cardID.equals(that.cardID);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(cardID);
+        return cardID.hashCode();
+    }
+
+    public String getName() {
+        return name;
+    }
+
+    @Override
+    public String toString() {
+        return "Card ID: " + cardID + ", Name: " + name + ", Floor: " + floor + ", Active: " + active;
     }
 }

@@ -1,7 +1,10 @@
 package service;
 
+import model.AccessCard;
+
 public interface CardManagementInterface {
-    void addCard(String cardID, String accessLevel);
-    void modifyCard(String cardID, String newAccessLevel);
+    AccessCard getCard(String cardID);
+    void addCard(String cardID, String floor, String name, String room);
+    void modifyCard(String cardID, String newFloor, String newRoom);
     void revokeCard(String cardID);
 }

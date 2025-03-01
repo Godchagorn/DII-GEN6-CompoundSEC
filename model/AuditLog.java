@@ -11,5 +11,9 @@ public abstract class AuditLog {
         this.timestamp = LocalDateTime.now();
     }
 
+    public String getCardID() {
+        return cardID;
+    }
+
     public abstract String logEvent();
 }
