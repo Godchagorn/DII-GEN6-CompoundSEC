@@ -1,5 +1,5 @@
-import GUI.Admin;
-import GUI.Customer;
+import GUI.*;
+import service.ConcreteAccessControlSystem;
 import service.AccessControlSystem;
 import javax.swing.*;
 import java.awt.*;
@@ -17,7 +17,7 @@ public class Main {
         cardPanel = new JPanel(new CardLayout());
         frame.add(cardPanel);
 
-        accessControlSystem = new AccessControlSystem();
+        accessControlSystem = ConcreteAccessControlSystem.getInstance();
 
         showSelectionView();
         frame.setVisible(true);

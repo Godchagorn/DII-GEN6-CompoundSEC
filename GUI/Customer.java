@@ -4,7 +4,6 @@ import service.AccessControlSystem;
 import javax.swing.*;
 import java.awt.*;
 import model.AccessCard;
-import java.util.HashMap;
 
 public class Customer {
     private JFrame frame;
@@ -21,9 +20,8 @@ public class Customer {
         JPanel customerPanel = new JPanel();
         customerPanel.setLayout(new BoxLayout(customerPanel, BoxLayout.Y_AXIS));
 
-        JLabel welcomeLabel = new JLabel("Welcome to User", JLabel.CENTER);
-        welcomeLabel.setFont(new Font("Arial", Font.BOLD, 40));
-        welcomeLabel.setAlignmentX(Component.CENTER_ALIGNMENT);
+        JLabel welcomeLabel = new JLabel("Welcome, User", JLabel.CENTER);
+        welcomeLabel.setFont(new Font("Arial", Font.BOLD, 30));
 
         JPanel inputPanel = new JPanel();
         inputPanel.setLayout(new FlowLayout(FlowLayout.CENTER));
@@ -33,9 +31,7 @@ public class Customer {
         inputPanel.add(idField);
 
         JButton backButton = new JButton("Back");
-        backButton.addActionListener(e -> {
-            ((CardLayout) cardPanel.getLayout()).show(cardPanel, "Selection");
-        });
+        backButton.addActionListener(e -> ((CardLayout) cardPanel.getLayout()).show(cardPanel, "Selection"));
 
         JButton nextButton = new JButton("Next");
         nextButton.addActionListener(e -> {
@@ -54,23 +50,22 @@ public class Customer {
             }
 
             JOptionPane.showMessageDialog(frame,
-                    "ID: " + userCard.getCardID() +
+                    "ID: " + userCard.getUserId() + // ✅ Use getUserId() instead of getCardID()
                             "\nName: " + userCard.getName() +
-                            "\nFloor: " + userCard.getFloor() + "\nRoom: " + userCard.getRoom(),
+                            "\nFloor: " + userCard.getFloor() +
+                            "\nRoom: " + userCard.getRoom() +
+                            "\nExpiry Date: " + userCard.getExpiryDate(),
                     "User Information", JOptionPane.INFORMATION_MESSAGE);
         });
+
 
         JPanel buttonPanel = new JPanel(new FlowLayout(FlowLayout.CENTER));
         buttonPanel.add(backButton);
         buttonPanel.add(nextButton);
 
-        customerPanel.add(Box.createVerticalGlue());
         customerPanel.add(welcomeLabel);
-        customerPanel.add(Box.createVerticalStrut(25));
         customerPanel.add(inputPanel);
-        customerPanel.add(Box.createVerticalStrut(15));
         customerPanel.add(buttonPanel);
-        customerPanel.add(Box.createVerticalGlue());
 
         cardPanel.add(customerPanel, "Customer");
         ((CardLayout) cardPanel.getLayout()).show(cardPanel, "Customer");

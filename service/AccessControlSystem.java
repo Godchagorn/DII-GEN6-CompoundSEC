@@ -2,11 +2,12 @@ package service;
 
 import model.*;
 import java.util.*;
+import java.time.LocalDate;
 
-public class AccessControlSystem implements CardManagementInterface {
-    private HashMap<String, AccessCard> cards;
-    private List<AuditLog> auditLogs;
-    private HashSet<String> selectedRooms;
+public abstract class AccessControlSystem implements CardManagementInterface {
+    protected HashMap<String, AccessCard> cards;
+    protected List<AuditLog> auditLogs;
+    protected HashSet<String> selectedRooms;
 
     public AccessControlSystem() {
         cards = new HashMap<>();
@@ -14,97 +15,89 @@ public class AccessControlSystem implements CardManagementInterface {
         selectedRooms = new HashSet<>();
     }
 
-    public AccessCard getCard(String cardID) {
-        return cards.getOrDefault(cardID, null);
+    @Override
+    public AccessCard getCard(String userId) {
+        if (userId == null || userId.trim().isEmpty()) {
+            System.out.println("❌ Error: User ID is null or empty!");
+            return null;
+        }
+
+        if (cards == null) {
+            System.out.println("❌ Error: cards HashMap is not initialized!");
+            return null;
+        }
+
+        if (!cards.containsKey(userId)) {
+            System.out.println("❌ Error: User ID " + userId + " not found! Available IDs: " + cards.keySet());
+            return null;
+        }
+
+        return cards.get(userId);
     }
 
-    public void addCard(String cardID, String floor, String name, String room) {
-        if (cards.containsKey(cardID)) {
-            System.out.println("Error: Card ID " + cardID + " already exists!");
+
+
+    public HashSet<String> getSelectedRooms() {
+        return selectedRooms;
+    }
+
+    public boolean hasCard(String userId) {
+        return cards.containsKey(userId);
+    }
+
+    @Override
+    public void addCard(String cardID, String userId, String floor, String name, String room, LocalDate expiryDate) {
+        if (hasCard(userId)) {
+            System.out.println("Error: User ID " + userId + " already has a card!");
             return;
         }
 
-        AccessCard newCard = new AccessCard(cardID, floor, room, name);
-        cards.put(cardID, newCard);
+        AccessCard newCard = new AccessCard(cardID, userId, floor, room, name, expiryDate);
+        cards.put(userId, newCard); // ✅ Ensure the userId is stored as key
 
-        String roomKey = floor + " - " + room;
-        selectedRooms.add(roomKey);
+        selectedRooms.add(floor + " - " + room);
+        auditLogs.add(new AddCardLog(cardID, name, floor, room, expiryDate));
 
-        AddCardLog log = new AddCardLog(cardID, name, floor, room);
-        auditLogs.add(log);
+        System.out.println("✅ Card added: " + newCard);
     }
 
-    public void modifyCard(String cardID, String newFloor, String newRoom) {
-        AccessCard card = getCard(cardID);
-        if (card == null) {
-            System.out.println("Error: Card with ID " + cardID + " does not exist.");
+
+    @Override
+    public void modifyCard(String userId, String newFloor, String newRoom, LocalDate newExpiryDate) {
+        if (!hasCard(userId)) {
+            System.out.println("Error: User ID " + userId + " not found!");
             return;
         }
 
+        AccessCard card = getCard(userId);
         String oldFloor = card.getFloor();
         String oldRoom = card.getRoom();
-        String oldName = card.getName();
-
-        String oldRoomKey = oldFloor + " - " + oldRoom;
-        selectedRooms.remove(oldRoomKey);
 
         card.setFloor(newFloor);
         card.setRoom(newRoom);
+        card.setExpiryDate(newExpiryDate);
 
-        String newRoomKey = newFloor + " - " + newRoom;
-        selectedRooms.add(newRoomKey);
+        selectedRooms.remove(oldFloor + " - " + oldRoom);
+        selectedRooms.add(newFloor + " - " + newRoom);
 
-        ModifyCardLog log = new ModifyCardLog(cardID, oldName, oldFloor, oldRoom, newFloor, newRoom);
-        auditLogs.add(log);
+        auditLogs.add(new ModifyCardLog(card.getCardID(), card.getName(), oldFloor, oldRoom, newFloor, newRoom, newExpiryDate));
+
+        System.out.println("✅ Card modified: " + card);
     }
 
-    public void revokeCard(String cardID) {
-        AccessCard card = getCard(cardID);
+    @Override
+    public void revokeCard(String userId) {
+        AccessCard card = getCard(userId);
         if (card == null) {
-            System.out.println("Error: Card with ID " + cardID + " does not exist.");
+            System.out.println("Error: Card with User ID " + userId + " does not exist.");
             return;
         }
 
-        if (Objects.nonNull(card.getRoom())) {
-            String roomKey = card.getFloor() + " - " + card.getRoom();
-            selectedRooms.remove(roomKey);
-            cards.remove(cardID);
-        }
+        selectedRooms.remove(card.getFloor() + " - " + card.getRoom());
+        cards.remove(userId);
+        auditLogs.add(new RevokeCardLog(card.getCardID(), card.getName(), card.getFloor(), card.getRoom(), card.getExpiryDate()));
 
-        RevokeCardLog log = new RevokeCardLog(cardID, card.getName(), card.getFloor(), card.getRoom());
-        auditLogs.add(log);
-    }
-
-
-    public boolean checkAccess(String cardID, String requestedRoom) {
-        AccessCard card = getCard(cardID);
-        if (card != null && card.isActive() && card.canAccessRoom(requestedRoom)) {
-            auditLogs.add(new CardModification(cardID, card.getName(), "Checked Access", card.getFloor(), requestedRoom));
-            return true;
-        }
-        return false;
-    }
-
-    public String getAccessMessage(String cardID, String room) {
-        AccessCard card = getCard(cardID);
-        if (card != null && card.isActive()) {
-            return checkAccess(cardID, room) ? "Access Granted to " + room : "Access Denied to " + room;
-        }
-        return "Card not found or inactive.";
-    }
-
-    public boolean hasCard(String cardID) {
-        return cards.containsKey(cardID);
-    }
-
-    public String getCardHistory(String cardID) {
-        StringBuilder history = new StringBuilder();
-        for (AuditLog log : auditLogs) {
-            if (log.getCardID().equals(cardID)) {
-                history.append(log.logEvent()).append("\n");
-            }
-        }
-        return history.toString().isEmpty() ? "No history found for Card ID: " + cardID : history.toString();
+        System.out.println("✅ Card revoked: " + userId);
     }
 
     public String getAuditLogs() {
@@ -117,9 +110,5 @@ public class AccessControlSystem implements CardManagementInterface {
             logs.append(log.logEvent()).append("\n");
         }
         return logs.toString();
-    }
-
-    public HashSet<String> getSelectedRooms() {
-        return selectedRooms;
     }
 }
