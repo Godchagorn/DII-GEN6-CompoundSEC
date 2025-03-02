@@ -15,8 +15,7 @@ public class RoleBasedAccess implements AccessStrategy {
         AccessCard card = accessControlSystem.getCard(userId);
         if (card == null) return false;
 
-        // Check if the user's role allows access to the requested room
         String assignedRoom = card.getRoom();
-        return assignedRoom.equals(room); // Simple role-based check
+        return assignedRoom.equals(room);
     }
 }

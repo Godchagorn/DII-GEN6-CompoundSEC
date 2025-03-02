@@ -50,7 +50,7 @@ public class Customer {
             }
 
             JOptionPane.showMessageDialog(frame,
-                    "ID: " + userCard.getUserId() + // ✅ Use getUserId() instead of getCardID()
+                    "ID: " + userCard.getUserId() +
                             "\nName: " + userCard.getName() +
                             "\nFloor: " + userCard.getFloor() +
                             "\nRoom: " + userCard.getRoom() +

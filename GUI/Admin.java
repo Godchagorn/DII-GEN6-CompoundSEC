@@ -7,7 +7,6 @@ import java.awt.*;
 import java.time.LocalDate;
 import java.util.Calendar;
 import java.util.HashSet;
-import java.util.Random;
 
 public class Admin {
     private JFrame frame;
@@ -105,7 +104,7 @@ public class Admin {
         JPanel panel = new JPanel(new GridLayout(7, 2));
 
         JTextField nameField = new JTextField();
-        JTextField userIdField = new JTextField(); // ✅ Admin manually enters the user ID.
+        JTextField userIdField = new JTextField();
 
         String[] floors = {"Floor 1", "Floor 2", "Floor 3"};
         JComboBox<String> floorComboBox = new JComboBox<>(floors);
@@ -118,30 +117,26 @@ public class Admin {
                 "July", "August", "September", "October", "November", "December"
         });
 
-        // ✅ Get the current date
         Calendar cal = Calendar.getInstance();
         int currentYear = cal.get(Calendar.YEAR);
         int currentMonth = cal.get(Calendar.MONTH); // 0-based index
 
-        // ✅ Allow selection up to 5 years in the future
         for (int i = currentYear; i <= currentYear + 5; i++) {
             yearComboBox.addItem(i);
         }
         yearComboBox.setSelectedItem(currentYear);
 
-        // ✅ Populate day selection
         for (int i = 1; i <= 31; i++) {
             dayComboBox.addItem(i);
         }
         monthComboBox.setSelectedIndex(currentMonth);
 
-        // ✅ Prevent selection of past dates
         yearComboBox.addActionListener(e -> updateDays(dayComboBox, (Integer) yearComboBox.getSelectedItem(), monthComboBox.getSelectedIndex() + 1));
         monthComboBox.addActionListener(e -> updateDays(dayComboBox, (Integer) yearComboBox.getSelectedItem(), monthComboBox.getSelectedIndex() + 1));
 
         panel.add(new JLabel("Name:"));
         panel.add(nameField);
-        panel.add(new JLabel("User ID:"));  // ✅ Admin manually enters User ID
+        panel.add(new JLabel("User ID:"));
         panel.add(userIdField);
         panel.add(new JLabel("Floor:"));
         panel.add(floorComboBox);
@@ -154,7 +149,6 @@ public class Admin {
 
         floorComboBox.addActionListener(e -> updateRoomList(roomComboBox, floorComboBox.getSelectedIndex()));
 
-        // ✅ Set default floor and populate room list
         floorComboBox.setSelectedIndex(0);
         updateRoomList(roomComboBox, 0);
         updateDays(dayComboBox, currentYear, currentMonth + 1);
@@ -163,15 +157,13 @@ public class Admin {
 
         if (result == JOptionPane.OK_OPTION) {
             String name = nameField.getText().trim();
-            String userId = userIdField.getText().trim(); // ✅ User ID manually entered by Admin
+            String userId = userIdField.getText().trim();
 
-            // ✅ Validate name input (only letters and spaces)
             if (!name.matches("[a-zA-Z\\s]+")) {
                 JOptionPane.showMessageDialog(frame, "Please enter a valid Name (only letters and spaces)!", "Error", JOptionPane.ERROR_MESSAGE);
                 return;
             }
 
-            // ✅ Validate User ID (must be 5-digit number)
             if (!userId.matches("\\d{5}")) {
                 JOptionPane.showMessageDialog(frame, "Please enter a valid User ID (exactly 5 digits)!", "Error", JOptionPane.ERROR_MESSAGE);
                 return;
@@ -191,13 +183,11 @@ public class Admin {
 
             LocalDate expiryDate = LocalDate.of(year, month, day);
 
-            // ✅ Prevent expired dates from being selected
             if (expiryDate.isBefore(LocalDate.now())) {
                 JOptionPane.showMessageDialog(frame, "Expiry date cannot be in the past!", "Error", JOptionPane.ERROR_MESSAGE);
                 return;
             }
 
-            // ✅ Use the Admin-entered User ID instead of generating one
             accessControlSystem.addCard(userId, userId, floor, name, room, expiryDate);
             JOptionPane.showMessageDialog(frame,
                     "Card Added Successfully!\nUser ID: " + userId,
@@ -220,7 +210,6 @@ public class Admin {
             dayComboBox.addItem(i);
         }
 
-        // ✅ ลบวันที่ย้อนหลังออกจากตัวเลือก
         if (selectedYear == LocalDate.now().getYear() && selectedMonth == LocalDate.now().getMonthValue()) {
             int currentDay = LocalDate.now().getDayOfMonth();
             for (int i = 1; i < currentDay; i++) {
@@ -229,8 +218,6 @@ public class Admin {
         }
         dayComboBox.setSelectedIndex(0);
     }
-
-
 
     private void updateRoomList(JComboBox<String> roomComboBox, int floorIndex) {
         String[][] rooms = {
@@ -246,7 +233,7 @@ public class Admin {
             return;
         }
 
-        HashSet<String> occupiedRooms = accessControlSystem.getSelectedRooms(); // ✅ ดึงรายชื่อห้องที่ถูกเลือกไปแล้ว
+        HashSet<String> occupiedRooms = accessControlSystem.getSelectedRooms();
         for (String room : rooms[floorIndex]) {
             String roomKey = "Floor " + (floorIndex + 1) + " - " + room;
 
@@ -274,7 +261,6 @@ public class Admin {
 
         JOptionPane.showMessageDialog(frame, new JScrollPane(auditLogArea), "Audit Log", JOptionPane.INFORMATION_MESSAGE);
     }
-
 
 
     private void modifyCard() {
@@ -332,7 +318,6 @@ public class Admin {
         panel.add(monthComboBox);
         panel.add(yearComboBox);
 
-        // ✅ Update room list when a floor is selected
         floorComboBox.addActionListener(e -> updateRoomList(roomComboBox, floorComboBox.getSelectedIndex()));
 
         int result = JOptionPane.showConfirmDialog(frame, panel, "Modify Card", JOptionPane.OK_CANCEL_OPTION);
@@ -368,14 +353,12 @@ public class Admin {
             return;
         }
 
-        // ✅ ดึงข้อมูลบัตร
         AccessCard card = accessControlSystem.getCard(userId);
         String name = card.getName();
         String floor = card.getFloor();
         String room = card.getRoom();
         LocalDate expiryDate = card.getExpiryDate();
 
-        // ✅ สร้าง Panel ที่มีข้อมูลการ์ด + ปุ่ม Revoke
         JPanel panel = new JPanel();
         panel.setLayout(new BoxLayout(panel, BoxLayout.Y_AXIS));
 
@@ -385,7 +368,6 @@ public class Admin {
         panel.add(new JLabel("Room: " + room));
         panel.add(new JLabel("Expiry Date: " + expiryDate));
 
-        // ✅ แสดง Pop-up ยืนยันการลบ
         int confirm = JOptionPane.showConfirmDialog(frame, panel,
                 "Confirm Revoke", JOptionPane.YES_NO_OPTION, JOptionPane.WARNING_MESSAGE);
 
@@ -406,13 +388,11 @@ public class Admin {
 
         AccessCard card = accessControlSystem.getCard(userId);
 
-        // ✅ If no card is found, notify the admin
         if (card == null) {
             JOptionPane.showMessageDialog(frame, "No card found for ID: " + userId, "Error", JOptionPane.ERROR_MESSAGE);
             return;
         }
 
-        // ✅ If the card exists, display its details
         JOptionPane.showMessageDialog(frame,
                 "ID: " + userId +
                         "\nName: " + card.getName() +

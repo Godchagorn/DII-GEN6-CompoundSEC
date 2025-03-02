@@ -53,7 +53,7 @@ public abstract class AccessControlSystem implements CardManagementInterface {
         }
 
         AccessCard newCard = new AccessCard(cardID, userId, floor, room, name, expiryDate);
-        cards.put(userId, newCard); // ✅ Ensure the userId is stored as key
+        cards.put(userId, newCard);
 
         selectedRooms.add(floor + " - " + room);
         auditLogs.add(new AddCardLog(cardID, name, floor, room, expiryDate));
