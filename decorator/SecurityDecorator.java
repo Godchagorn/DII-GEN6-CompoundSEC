@@ -9,6 +9,12 @@ public class SecurityDecorator extends AccessControlDecorator {
         super(decoratedAccess);
     }
 
+
+
+    //Card generation or modification will be logged with necessary info
+    //ทุกครั้งที่ผู้ใช้พยายามเข้าใช้ห้อง ระบบจะทำการบันทึกข้อมูล
+    //หากผู้ใช้ไม่มีสิทธิ์ ระบบจะแสดง "Access Denied" และบันทึกลงใน Audit Log
+
     @Override
     public boolean hasAccess(String userId, String room) {
         LocalTime currentTime = LocalTime.now();

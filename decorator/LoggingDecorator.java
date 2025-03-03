@@ -7,6 +7,10 @@ public class LoggingDecorator extends AccessControlDecorator {
         super(decoratedAccess);
     }
 
+
+    //Each attempts will be logged with necessary info
+    //
+
     @Override
     public boolean hasAccess(String userId, String room) {
         boolean result = super.hasAccess(userId, room);

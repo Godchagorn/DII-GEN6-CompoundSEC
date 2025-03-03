@@ -1,7 +1,6 @@
 package service;
 
 import model.AccessCard;
-
 import java.time.LocalDate;
 
 public interface CardManagementInterface {
